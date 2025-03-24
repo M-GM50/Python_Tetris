@@ -100,4 +100,73 @@ SHAPES = [
     ],
 ]
 
+## Class for Tetromino
+class Tetromino:
+    def __init__(self, x, y, shape):
+        self.x = x
+        self.y = y
+        self.shape = shape
+        self.color = random.choice(COLORS)
+        self.rotation = 0
 
+## Class for canvas + state of the game + score
+class Tetris:
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.grid = [[0 for _ in range(width)] for _ in range(height)]
+        self.current_piece = self.new_piece()
+        self.game_over = False
+        self.score = 0 # Add score attribute
+
+##Methods
+
+def new_piece(self):
+    # Choose a random shape
+    shape = random.choice(SHAPES)
+
+    # Return a new Tetromino object
+    return Tetromino(self.width // 2, 0, shape)
+
+def valid_move(self, piece, x, y, rotation):
+    # Check if the piece can move to the given position
+    for i, row in enumerate(piece.shape[(piece.rotation + rotation) % len(piece.shape)]):
+        for j, cell in enumerate(row):
+            try:
+                if cell == '0' and (self.grid[piece.y + i + y][piece.x + j + x] != 0):
+                    return False
+            except IndexError:
+                return False
+            return True
+    
+def clear_lines(self):
+    # Clear the lines that are full and return the number of cleared lines
+    lines_cleared = 0
+    for i, row in enumerate(self.grid[:-1]):
+        if all(cell !=0 for cell in row):
+            lines_cleared += 1
+            del self.grid[i]
+            self.grid.insert(0, [0 for _ in range(self.width)])
+    return lines_cleared
+
+def lock_piece(self, piece):
+    # Lock the piece in place
+    for i, row in enumerate(piece.shape[piece.rotation % len(piece.shape)]):
+        for j, cell in enumerate(row):
+            if cell == '0':
+                self.grid[piece.y + i][piece.x + j] = piece.color 
+
+    # Clear the lines and update the score
+    lines_cleared = self.clear_lines()
+
+    # Update the score based on the number of cleared lines
+    self.score += lines_cleared * 100 
+
+    # Create a new piece
+    self.current_piece = self.new_piece()
+
+    # Check if the game is over (= no more valid moves)
+    if not self.valid_move(self.current_piece, 0, 0, 0):
+        self.game_over = True
+        return lines_cleared
+    
